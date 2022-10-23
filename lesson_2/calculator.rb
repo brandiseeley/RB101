@@ -1,24 +1,29 @@
-# Bad practice to use the same variable name with different types. fix it yo
+require 'yaml'
+MESSAGES = YAML.load_file('calculator_messages.yml')
 
 def prompt(message)
   puts("=> #{message}")
 end
 
 def valid_number?(num_string)
-  if num_string.match?(/\D/) || num_string.empty?
-    return false
-  else
-    return true
-  end
+  integer?(num_string) || float?(num_string)
 end
 
-prompt('Welcome to Calculator! Enter your name:')
+def integer?(input)
+  /^-?\d+$/.match(input)
+end
+
+def float?(input)
+  input.to_f.to_s == input
+end
+
+prompt(MESSAGES['welcome'])
 
 name = ''
 loop do
   name = gets.chomp
   if name.empty?
-    prompt("Make sure to use a valid name.")
+    prompt(MESSAGES['valid_name'])
   else
     break
   end
@@ -29,25 +34,25 @@ prompt("Hi #{name}")
 loop do
   number1 = ''
   loop do
-    prompt('What\'s the first number?')
+    prompt(MESSAGES['first_number'])
     number1 = gets.chomp
 
     if valid_number?(number1)
       break
     else
-      prompt("Hmm...that doesn't look like a valid number")
+      prompt(MESSAGES['invalid_number'])
     end
   end
 
   number2 = ''
   loop do
-    prompt('What\'s the second number?')
+    prompt(MESSAGES['second_number'])
     number2 = gets.chomp
 
     if valid_number?(number2)
       break
     else
-      prompt("Hmm...that doesn't look like a valid number")
+      prompt(MESSAGES['invalid_number'])
     end
   end
 
@@ -64,14 +69,7 @@ loop do
     end
   end
 
-  operator_prompt = <<-MSG
-    What operation would you like to perform?
-    1) add
-    2) subtract
-    3) multiply
-    4) divide
-  MSG
-  prompt(operator_prompt)
+  prompt(MESSAGES['operator'])
 
   operator = ''
   loop do
@@ -79,7 +77,7 @@ loop do
     if %w(1 2 3 4).include?(operator)
       break
     else
-      prompt("Must choose 1, 2, 3, or 4")
+      prompt(MESSAGES['choose_1234'])
     end
   end
 
@@ -93,7 +91,7 @@ loop do
            when '3'
              number1.to_i * number2.to_i
            when '4'
-             if number2.to_i == 0
+             if number2.to_f == 0
               nil
              else
               number1.to_f / number2.to_f
@@ -104,12 +102,12 @@ loop do
   if result != nil
     prompt("The result is #{result}")
   else
-    prompt("ERROR: Cannot divide by zero. Try again!")
+    prompt(MESSAGES['div_zero'])
   end
 
-  prompt("Do you want to perform another calculation? (Y to calculate again)")
+  prompt(MESSAGES['another_calc'])
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-Prompt('Thank you for using the calculator. Goodbye!')
+prompt(MESSAGES['goodbye'])
